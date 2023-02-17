@@ -15,7 +15,7 @@ public class BlogSiteDbContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseSqlServer("server=db,1433;database=BlogSiteDb;uid=sa;pwd=myStrongPassword123;");
+        optionsBuilder.UseSqlServer("server=localhost,1433;database=BlogSiteDb;uid=sa;pwd=yourStrongPassword123;TrustServerCertificate=True");
     }
     public DbSet<Sex> Sexes { get; set; }
     public DbSet<User> Users { get; set; }
