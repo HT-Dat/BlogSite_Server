@@ -7,7 +7,7 @@ public class Category
 {
     public Category()
     {
-        Children = new HashSet<Category>();
+        ChildCategories = new HashSet<Category>();
     }
 
     [Key]
@@ -22,7 +22,7 @@ public class Category
     [Column("parent_id", TypeName = "int")]
     public int? ParentId { get; set; }
 
-    public Category Parent { get; set; }
+    public Category ParentCategory { get; set; }
     
-    public virtual ICollection<Category> Children { get; set; }
+    public virtual ICollection<Category> ChildCategories { get; set; }
 }
