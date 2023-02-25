@@ -5,11 +5,6 @@ namespace DAL;
 
 public class Category
 {
-    public Category()
-    {
-        ChildCategories = new HashSet<Category>();
-    }
-
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     [Column("id", TypeName = "int")]
@@ -24,5 +19,5 @@ public class Category
 
     public Category ParentCategory { get; set; }
     
-    public virtual ICollection<Category> ChildCategories { get; set; }
+    public ICollection<Category> ChildCategories { get; set; }
 }

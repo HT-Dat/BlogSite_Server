@@ -5,11 +5,6 @@ namespace DAL;
 
 public class Sex
 {
-    public Sex()
-    {
-        Users = new HashSet<User>();
-    }
-
     [Key]
     [Column("id", TypeName = "tinyint")]
     public byte? Id { get; set; }
@@ -17,5 +12,5 @@ public class Sex
     [Column("name", TypeName = "nvarchar(64)")]
     public string? Name { get; set; }
     
-    public virtual ICollection<User> Users { get; set; }
+    public ICollection<User> Users { get; set; }
 }
