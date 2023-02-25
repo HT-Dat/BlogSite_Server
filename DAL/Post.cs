@@ -5,11 +5,6 @@ namespace DAL;
 
 public class Post
 {
-    public Post()
-    {
-        ChildPosts = new HashSet<Post>();
-    }
-
     [Key]
     [Column("id",TypeName = "int")]
     public int Id { get; set; }
@@ -33,8 +28,19 @@ public class Post
     [Column("published_date", TypeName = "datetime2(7)")]
     public DateTime PublishedDate { get; set; }
     
+    [ForeignKey("PostStatus")]
+    [Column("status_id", TypeName = "tinyint")]
+    public byte StatusId { get; set; }
+    public PostStatus PostStatus { get; set; }
     
+    [Column("title", TypeName = "nvarchar(255)")]
+    public string Title { get; set; }
     
-    public virtual ICollection<Post> ChildPosts { get; set; }
+    [Column("content",TypeName = "nvarchar(max)")]
+    public string Content { get; set; }
     
+    public ICollection<Post> ChildPosts { get; set; }
+    public ICollection<Comment> Comments { get; set; }
+    public ICollection<PostCategory> PostCategories { get; set; }
+    public ICollection<PostTag> PostTags { get; set; }
 }
