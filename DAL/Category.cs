@@ -20,4 +20,5 @@ public class Category
     public Category ParentCategory { get; set; }
     
     public ICollection<Category> ChildCategories { get; set; }
+    public ICollection<PostCategory> PostCategories { get; set; }
 }
