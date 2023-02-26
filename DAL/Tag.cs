@@ -13,5 +13,5 @@ public class Tag
     [Column("name", TypeName = "nvarchar(max)")]
     public string Name { get; set; }
 
-    public ICollection<Tag> Tags { get; set; }
+    public ICollection<PostTag> PostTags { get; set; }
 }
