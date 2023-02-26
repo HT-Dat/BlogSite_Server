@@ -18,4 +18,6 @@ public class User
     public byte SexId { get; set; }
     
     public Sex Sex { get; set; }
+
+    public ICollection<Comment> Comments { get; set; }
 }
