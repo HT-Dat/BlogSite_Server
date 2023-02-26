@@ -14,7 +14,7 @@ public class Post
     public int AuthorId { get; set; }
     public User Author { get; set; }
     
-    [ForeignKey("Parent")]
+    [ForeignKey("ParentPost")]
     [Column("parent_id", TypeName = "int")]
     public int? ParentId { get; set; }
     public Post ParentPost { get; set; }
