@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DAL;
+[Table("Post")]
 
 public class Post
 {
@@ -10,8 +11,8 @@ public class Post
     public int Id { get; set; }
 
     [ForeignKey("Author")]
-    [Column("author_id",TypeName = "int")]
-    public int AuthorId { get; set; }
+    [Column("author_id",TypeName = "varchar(128)")]
+    public string AuthorId { get; set; }
     public User Author { get; set; }
     
     [ForeignKey("ParentPost")]
