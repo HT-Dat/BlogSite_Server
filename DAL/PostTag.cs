@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
 namespace DAL;
+[Table("PostTag")]
 [PrimaryKey(nameof(TagId), nameof(PostId))]
 public class PostTag
 {

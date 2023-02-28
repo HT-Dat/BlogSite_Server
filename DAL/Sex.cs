@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DAL;
-
+[Table("Sex")]
 public class Sex
 {
     [Key]
