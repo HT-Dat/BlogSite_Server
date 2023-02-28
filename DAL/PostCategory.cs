@@ -1,7 +1,9 @@
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace DAL;
-
+[Table("PostCategory")]
+[PrimaryKey(nameof(CategoryId), nameof(PostId))]
 public class PostCategory
 {
     [ForeignKey("Category")]
