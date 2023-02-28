@@ -28,8 +28,8 @@ public class Comment
     
     [ForeignKey(nameof(Post))]
     [Column("post_id",TypeName = "int")]
-    public int PostId { get; set; }
-    public Post Post { get; set; }
+    public int? PostId { get; set; }
+    public Post? Post { get; set; }
     
     public ICollection<Comment> ChildComments { get; set; }
     

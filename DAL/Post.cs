@@ -31,7 +31,7 @@ public class Post
     
     [ForeignKey("PostStatus")]
     [Column("status_id", TypeName = "tinyint")]
-    public byte StatusId { get; set; }
+    public byte? StatusId { get; set; }
     public PostStatus PostStatus { get; set; }
     
     [Column("title", TypeName = "nvarchar(255)")]

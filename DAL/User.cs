@@ -15,7 +15,7 @@ public class User
 
     [Column("sex_id")] 
     [ForeignKey("Sex")]
-    public byte SexId { get; set; }
+    public byte? SexId { get; set; }
     
     public Sex Sex { get; set; }
 
