@@ -15,10 +15,10 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 FirebaseApp.Create(new AppOptions()
 {
-    Credential = GoogleCredential.GetApplicationDefault(),
+    Credential = GoogleCredential.FromJson(Environment.GetEnvironmentVariable("FIREBASE_SECRET")),
 });
 builder.Services.AddDbContext<BlogSiteDbContext>(
-    options => options.UseSqlServer(Environment.GetEnvironmentVariable("")));
+    options => options.UseSqlServer(Environment.GetEnvironmentVariable("SQL_CONNECTION_STRING")));
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {
     options.Authority = "https://securetoken.google.com/hotiendat-blog";

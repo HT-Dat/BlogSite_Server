@@ -1,6 +1,5 @@
 # syntax=docker/dockerfile:1
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build-env
-ARG FIREBASE_SECRET
 WORKDIR /app
 EXPOSE 80
 EXPOSE 443
@@ -16,7 +15,6 @@ RUN dotnet restore
 COPY DAL/. ./DAL/
 COPY BAL/. ./BAL/
 COPY WebAPI/. ./WebAPI/
-RUN dotnet publish -c Release -o out && echo "$FIREBASE_SECRET" > ./out/hotiendat-blog-firebase-adminsdk-yc5sy-c44eb20ff1.json 
 #Build runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:6.0
 WORKDIR /app
