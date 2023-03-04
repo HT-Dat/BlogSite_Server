@@ -12,7 +12,7 @@ COPY WebAPI/*.csproj ./WebAPI/
 RUN dotnet restore
 
 #Copy everything else and build
-COPY DAL. ./DAL/
+COPY DAL/. ./DAL/
 COPY BAL/. ./BAL/
 COPY WebAPI/. ./WebAPI/
 RUN dotnet publish -c Release -o out
