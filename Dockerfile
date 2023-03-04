@@ -15,12 +15,11 @@ RUN dotnet restore
 COPY DAL/. ./DAL/
 COPY BAL/. ./BAL/
 COPY WebAPI/. ./WebAPI/
-RUN dotnet publish -c Release -o out
-
+RUN dotnet publish -c Release -o out && echo "$FIREBASE_SECRET" > ./out/hotiendat-blog-firebase-adminsdk-yc5sy-c44eb20ff1.json 
 #Build runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:6.0
 WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 COPY --from=build-env /app/out .
-CMD echo "$FIREBASE_SECRET" > hotiendat-blog-firebase-adminsdk-yc5sy-c44eb20ff1.json && dotnet WebAPI.dll && fg
+CMD dotnet WebAPI.dll && fg
