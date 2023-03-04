@@ -1,5 +1,6 @@
 # syntax=docker/dockerfile:1
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build-env
+ARG FIREBASE_SECRET
 WORKDIR /app
 EXPOSE 80
 EXPOSE 443
