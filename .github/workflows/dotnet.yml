@@ -24,4 +24,4 @@ jobs:
           push: true
           tags: hotiendat/blogsite-server:latest
           build-args: |
-            FIREBASE_SECRET=${{ secrets.$FIREBASE_SECRET }}
+            FIREBASE_SECRET=${{ secrets.FIREBASE_SECRET }}
