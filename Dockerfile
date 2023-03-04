@@ -23,4 +23,4 @@ WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 COPY --from=build-env /app/out .
-CMD echo "$FIREBASE_SECRET" > hotiendat-blog-firebase-adminsdk-yc5sy-c44eb20ff1.json
+CMD echo "$FIREBASE_SECRET" > hotiendat-blog-firebase-adminsdk-yc5sy-c44eb20ff1.json && dotnet WebAPI.dll && fg
