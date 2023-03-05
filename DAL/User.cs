@@ -16,8 +16,19 @@ public class User
     [Column("sex_id")] 
     [ForeignKey("Sex")]
     public byte? SexId { get; set; }
-    
     public Sex Sex { get; set; }
+    
+    [Column("created_date",TypeName = "datetime2(7)")]
+    public DateTime CreatedDate { get; set; }
+    
+    [Column("last_login",TypeName = "datetime2(7)")]
+    public DateTime LastLogin { get; set; }
+    
+    [Column("intro",TypeName = "nvarchar(255)")]
+    public string Intro { get; set; }
+    
+    [Column("profile",TypeName = "nvarchar(max)")]
+    public string Profile { get; set; }
 
     public ICollection<Comment> Comments { get; set; }
     public ICollection<Post> Posts { get; set; }
