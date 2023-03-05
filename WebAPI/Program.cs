@@ -33,6 +33,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 });
 
 var app = builder.Build();
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<BlogSiteDbContext>();
+    context.Database.Migrate();
+}
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
