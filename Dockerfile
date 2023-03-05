@@ -7,7 +7,7 @@ EXPOSE 443
 #Copy csproj and restore as distinct layers
 COPY *.sln ./
 COPY DAL/*.csproj ./DAL/
-COPY BAL/*.csproj ./BAL/
+COPY BLL/*.csproj ./BLL/
 COPY WebAPI/*.csproj ./WebAPI/
 RUN dotnet restore
 
