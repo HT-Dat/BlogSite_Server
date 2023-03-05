@@ -16,8 +16,6 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<BlogSiteDbContext>(
     options => options.UseSqlServer(Environment.GetEnvironmentVariable("SQL_CONNECTION_STRING")));
-// Firebase init will cause error on ef migrations because missing env like FIREBASE_SECRET which made the API to crash
-// Need to comment this section before doing anythings related to ef migrations
 if (Environment.GetEnvironmentVariable("FIREBASE_SECRET").IsNullOrEmpty() == false)
 {
     FirebaseApp.Create(new AppOptions()
