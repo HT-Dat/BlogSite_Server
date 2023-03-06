@@ -22,7 +22,7 @@ namespace DAL.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("DAL.Category", b =>
+            modelBuilder.Entity("DAL.Entities.Category", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -47,7 +47,7 @@ namespace DAL.Migrations
                     b.ToTable("Category");
                 });
 
-            modelBuilder.Entity("DAL.Comment", b =>
+            modelBuilder.Entity("DAL.Entities.Comment", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -89,7 +89,7 @@ namespace DAL.Migrations
                     b.ToTable("Comment");
                 });
 
-            modelBuilder.Entity("DAL.Post", b =>
+            modelBuilder.Entity("DAL.Entities.Post", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -144,7 +144,7 @@ namespace DAL.Migrations
                     b.ToTable("Post");
                 });
 
-            modelBuilder.Entity("DAL.PostCategory", b =>
+            modelBuilder.Entity("DAL.Entities.PostCategory", b =>
                 {
                     b.Property<int>("CategoryId")
                         .HasColumnType("int")
@@ -161,7 +161,7 @@ namespace DAL.Migrations
                     b.ToTable("PostCategory");
                 });
 
-            modelBuilder.Entity("DAL.PostStatus", b =>
+            modelBuilder.Entity("DAL.Entities.PostStatus", b =>
                 {
                     b.Property<byte>("Id")
                         .HasColumnType("tinyint")
@@ -177,7 +177,7 @@ namespace DAL.Migrations
                     b.ToTable("PostStatus");
                 });
 
-            modelBuilder.Entity("DAL.PostTag", b =>
+            modelBuilder.Entity("DAL.Entities.PostTag", b =>
                 {
                     b.Property<int>("TagId")
                         .HasColumnType("int")
@@ -194,7 +194,7 @@ namespace DAL.Migrations
                     b.ToTable("PostTag");
                 });
 
-            modelBuilder.Entity("DAL.Sex", b =>
+            modelBuilder.Entity("DAL.Entities.Sex", b =>
                 {
                     b.Property<byte>("Id")
                         .HasColumnType("tinyint")
@@ -210,7 +210,7 @@ namespace DAL.Migrations
                     b.ToTable("Sex");
                 });
 
-            modelBuilder.Entity("DAL.Tag", b =>
+            modelBuilder.Entity("DAL.Entities.Tag", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -229,7 +229,7 @@ namespace DAL.Migrations
                     b.ToTable("Tag");
                 });
 
-            modelBuilder.Entity("DAL.User", b =>
+            modelBuilder.Entity("DAL.Entities.User", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("varchar(128)")
@@ -243,6 +243,11 @@ namespace DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(128)")
                         .HasColumnName("display_name");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("email");
 
                     b.Property<string>("Intro")
                         .IsRequired()
@@ -270,28 +275,28 @@ namespace DAL.Migrations
                     b.ToTable("User");
                 });
 
-            modelBuilder.Entity("DAL.Category", b =>
+            modelBuilder.Entity("DAL.Entities.Category", b =>
                 {
-                    b.HasOne("DAL.Category", "ParentCategory")
+                    b.HasOne("DAL.Entities.Category", "ParentCategory")
                         .WithMany("ChildCategories")
                         .HasForeignKey("ParentId");
 
                     b.Navigation("ParentCategory");
                 });
 
-            modelBuilder.Entity("DAL.Comment", b =>
+            modelBuilder.Entity("DAL.Entities.Comment", b =>
                 {
-                    b.HasOne("DAL.User", "Author")
+                    b.HasOne("DAL.Entities.User", "Author")
                         .WithMany("Comments")
                         .HasForeignKey("AuthorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("DAL.Comment", "ParentComment")
+                    b.HasOne("DAL.Entities.Comment", "ParentComment")
                         .WithMany("ChildComments")
                         .HasForeignKey("ParentId");
 
-                    b.HasOne("DAL.Post", "Post")
+                    b.HasOne("DAL.Entities.Post", "Post")
                         .WithMany("Comments")
                         .HasForeignKey("PostId");
 
@@ -302,19 +307,19 @@ namespace DAL.Migrations
                     b.Navigation("Post");
                 });
 
-            modelBuilder.Entity("DAL.Post", b =>
+            modelBuilder.Entity("DAL.Entities.Post", b =>
                 {
-                    b.HasOne("DAL.User", "Author")
+                    b.HasOne("DAL.Entities.User", "Author")
                         .WithMany("Posts")
                         .HasForeignKey("AuthorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("DAL.Post", "ParentPost")
+                    b.HasOne("DAL.Entities.Post", "ParentPost")
                         .WithMany("ChildPosts")
                         .HasForeignKey("ParentId");
 
-                    b.HasOne("DAL.PostStatus", "PostStatus")
+                    b.HasOne("DAL.Entities.PostStatus", "PostStatus")
                         .WithMany("Posts")
                         .HasForeignKey("StatusId");
 
@@ -325,15 +330,15 @@ namespace DAL.Migrations
                     b.Navigation("PostStatus");
                 });
 
-            modelBuilder.Entity("DAL.PostCategory", b =>
+            modelBuilder.Entity("DAL.Entities.PostCategory", b =>
                 {
-                    b.HasOne("DAL.Category", "Category")
+                    b.HasOne("DAL.Entities.Category", "Category")
                         .WithMany("PostCategories")
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("DAL.Post", "Post")
+                    b.HasOne("DAL.Entities.Post", "Post")
                         .WithMany("PostCategories")
                         .HasForeignKey("PostId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -344,15 +349,15 @@ namespace DAL.Migrations
                     b.Navigation("Post");
                 });
 
-            modelBuilder.Entity("DAL.PostTag", b =>
+            modelBuilder.Entity("DAL.Entities.PostTag", b =>
                 {
-                    b.HasOne("DAL.Post", "Post")
+                    b.HasOne("DAL.Entities.Post", "Post")
                         .WithMany("PostTags")
                         .HasForeignKey("PostId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("DAL.Tag", "Tag")
+                    b.HasOne("DAL.Entities.Tag", "Tag")
                         .WithMany("PostTags")
                         .HasForeignKey("TagId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -363,9 +368,9 @@ namespace DAL.Migrations
                     b.Navigation("Tag");
                 });
 
-            modelBuilder.Entity("DAL.User", b =>
+            modelBuilder.Entity("DAL.Entities.User", b =>
                 {
-                    b.HasOne("DAL.Sex", "Sex")
+                    b.HasOne("DAL.Entities.Sex", "Sex")
                         .WithMany("Users")
                         .HasForeignKey("SexId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -374,19 +379,19 @@ namespace DAL.Migrations
                     b.Navigation("Sex");
                 });
 
-            modelBuilder.Entity("DAL.Category", b =>
+            modelBuilder.Entity("DAL.Entities.Category", b =>
                 {
                     b.Navigation("ChildCategories");
 
                     b.Navigation("PostCategories");
                 });
 
-            modelBuilder.Entity("DAL.Comment", b =>
+            modelBuilder.Entity("DAL.Entities.Comment", b =>
                 {
                     b.Navigation("ChildComments");
                 });
 
-            modelBuilder.Entity("DAL.Post", b =>
+            modelBuilder.Entity("DAL.Entities.Post", b =>
                 {
                     b.Navigation("ChildPosts");
 
@@ -397,22 +402,22 @@ namespace DAL.Migrations
                     b.Navigation("PostTags");
                 });
 
-            modelBuilder.Entity("DAL.PostStatus", b =>
+            modelBuilder.Entity("DAL.Entities.PostStatus", b =>
                 {
                     b.Navigation("Posts");
                 });
 
-            modelBuilder.Entity("DAL.Sex", b =>
+            modelBuilder.Entity("DAL.Entities.Sex", b =>
                 {
                     b.Navigation("Users");
                 });
 
-            modelBuilder.Entity("DAL.Tag", b =>
+            modelBuilder.Entity("DAL.Entities.Tag", b =>
                 {
                     b.Navigation("PostTags");
                 });
 
-            modelBuilder.Entity("DAL.User", b =>
+            modelBuilder.Entity("DAL.Entities.User", b =>
                 {
                     b.Navigation("Comments");
 
