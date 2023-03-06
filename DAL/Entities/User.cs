@@ -29,7 +29,10 @@ public class User
     
     [Column("profile",TypeName = "nvarchar(max)")]
     public string Profile { get; set; }
-
+    
+    [Column("email",TypeName = "nvarchar(255)")]
+    public string Email { get; set; }
+    
     public ICollection<Comment> Comments { get; set; }
     public ICollection<Post> Posts { get; set; }
 }
