@@ -13,7 +13,7 @@ RUN dotnet restore
 
 #Copy everything else and build
 COPY DAL/. ./DAL/
-COPY BAL/. ./BAL/
+COPY BLL/. ./BLL/
 COPY WebAPI/. ./WebAPI/
 RUN dotnet publish -c Release -o out
 #Build runtime image
