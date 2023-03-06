@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace DAL;
+namespace DAL.Entities;
 [Table("User")]
 public class User
 {

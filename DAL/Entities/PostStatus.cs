@@ -1,9 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace DAL;
-[Table("Sex")]
-public class Sex
+namespace DAL.Entities;
+[Table("PostStatus")]
+public class PostStatus
 {
     [Key]
     [Column("id", TypeName = "tinyint")]
@@ -12,5 +12,5 @@ public class Sex
     [Column("name", TypeName = "nvarchar(64)")]
     public string Name { get; set; }
     
-    public ICollection<User> Users { get; set; }
+    public ICollection<Post> Posts { get; set; }
 }
