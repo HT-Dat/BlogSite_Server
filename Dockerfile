@@ -9,12 +9,14 @@ COPY *.sln ./
 COPY DAL/*.csproj ./DAL/
 COPY BLL/*.csproj ./BLL/
 COPY WebAPI/*.csproj ./WebAPI/
+COPY DTO/*.csproj ./DTO/
 RUN dotnet restore
 
 #Copy everything else and build
 COPY DAL/. ./DAL/
 COPY BLL/. ./BLL/
 COPY WebAPI/. ./WebAPI/
+COPY DTO/. ./DTO/
 RUN dotnet publish -c Release -o out
 #Build runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:6.0
