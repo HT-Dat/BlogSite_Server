@@ -1,3 +1,5 @@
+using BLL.Services;
+using BLL.Services.IServices;
 using DAL;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
@@ -13,6 +15,8 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 builder.Services.AddDbContext<BlogSiteDbContext>(
     options => options.UseSqlServer(Environment.GetEnvironmentVariable("SQL_CONNECTION_STRING")));
