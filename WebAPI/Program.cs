@@ -1,3 +1,4 @@
+using BLL;
 using BLL.Services;
 using BLL.Services.IServices;
 using DAL;
@@ -16,7 +17,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.RegisterBllDependencies(builder.Configuration);
 
 builder.Services.AddDbContext<BlogSiteDbContext>(
     options => options.UseSqlServer(Environment.GetEnvironmentVariable("SQL_CONNECTION_STRING")));
