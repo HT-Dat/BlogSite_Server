@@ -33,6 +33,9 @@ public class User
     [Column("email",TypeName = "nvarchar(255)")]
     public string Email { get; set; }
     
+    [Column("is_admin",TypeName = "bit")]
+    public bool IsAdmin { get; set; }
+    
     public ICollection<Comment> Comments { get; set; }
     public ICollection<Post> Posts { get; set; }
 }
