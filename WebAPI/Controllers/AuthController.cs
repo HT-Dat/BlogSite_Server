@@ -2,9 +2,9 @@ using System.Security.Claims;
 using FirebaseAdmin.Auth;
 using System.Text.Json;
 using BLL.Services.IServices;
+using DTO.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
 namespace WebAPI.Controllers;
 
 [ApiController]
@@ -16,12 +16,11 @@ public class AuthController : Controller
     {
         _authService = authService;
     }
-    [HttpPost("verify-access")]
+    [HttpGet("verify-access")]
     [Authorize]
     public async Task<IActionResult> VerifyAccess()
     {
         string uid = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-        Console.WriteLine(uid);
         var status = await _authService.VerifyAccess(uid);
         return Ok(status);
     }
@@ -30,7 +29,12 @@ public class AuthController : Controller
     [Authorize]
     public async Task<IActionResult> Register()
     {
-        
-        return Ok();
+        var userToRegisterDto = new UserToRegisterDto
+        {
+            id = User.FindFirst(ClaimTypes.NameIdentifier).Value,
+            email = User.FindFirst(ClaimTypes.Email).Value
+        };
+        var user = await _authService.RegisterUser(userToRegisterDto);
+        return Ok(user);
     }
 }

@@ -1,5 +1,6 @@
 using BLL.Services.IServices;
 using DAL;
+using DAL.Entities;
 using DTO.DTOs;
 
 namespace BLL.Services;
@@ -35,5 +36,27 @@ public class AuthService : IAuthService
             Message = message,
             Status = status
         };
+    }
+
+    public async Task<User> RegisterUser(UserToRegisterDto userToRegisterDto)
+    {
+        var userInDb = await _blogSiteDbContext.Users.FindAsync(userToRegisterDto.id);
+        if (userInDb != null)
+        {
+            return userInDb;
+        }
+        var addingUser = new User
+        {
+            Id = userToRegisterDto.id,
+            Email = userToRegisterDto.email,
+            DisplayName = string.Empty,
+            Intro = string.Empty,
+            Profile = string.Empty,
+            SexId = 1
+        };
+        await _blogSiteDbContext.Users.AddAsync(addingUser);
+        await _blogSiteDbContext.SaveChangesAsync();
+        return addingUser;
+
     }
 }
