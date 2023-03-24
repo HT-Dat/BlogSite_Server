@@ -43,6 +43,8 @@ public class AuthService : IAuthService
         var userInDb = await _blogSiteDbContext.Users.FindAsync(userToRegisterDto.id);
         if (userInDb != null)
         {
+            userInDb.LastLogin = DateTime.UtcNow;
+            await _blogSiteDbContext.SaveChangesAsync();
             return userInDb;
         }
         var addingUser = new User
@@ -52,7 +54,9 @@ public class AuthService : IAuthService
             DisplayName = string.Empty,
             Intro = string.Empty,
             Profile = string.Empty,
-            SexId = 1
+            SexId = 1,
+            CreatedDate = DateTime.UtcNow,
+            LastLogin = DateTime.Now
         };
         await _blogSiteDbContext.Users.AddAsync(addingUser);
         await _blogSiteDbContext.SaveChangesAsync();
