@@ -6,7 +6,7 @@ using DTO.DTOs;
 
 namespace BLL.Services;
 
-public class PostService :IPostService
+public class PostService : IPostService
 {
     private readonly BlogSiteDbContext _blogSiteDbContext;
     private readonly IMapper _mapper;
@@ -17,9 +17,10 @@ public class PostService :IPostService
         _mapper = mapper;
     }
 
-    public Task<Post> Get(int id)
+    public async Task<PostToReturnDto> Get(int id)
     {
-        throw new NotImplementedException();
+        var post = await _blogSiteDbContext.Posts.FindAsync(id);
+        return _mapper.Map<PostToReturnDto>(post);
     }
 
     public async Task<Post> Add(string authorId)
@@ -41,8 +42,16 @@ public class PostService :IPostService
         throw new NotImplementedException();
     }
 
-    public Task Update(Post post)
+    public async Task<PostToReturnDto> Update(PostToUpdate postToUpdate)
     {
-        throw new NotImplementedException();
+        var updatingPost = _mapper.Map<Post>(postToUpdate);
+        updatingPost.UpdatedDate = DateTime.UtcNow;
+        _blogSiteDbContext.Entry<Post>(updatingPost).Property(o => o.Content).IsModified = true;
+        _blogSiteDbContext.Entry<Post>(updatingPost).Property(o => o.Title).IsModified = true;
+        _blogSiteDbContext.Entry<Post>(updatingPost).Property(o => o.StatusId).IsModified = true;
+        _blogSiteDbContext.Entry<Post>(updatingPost).Property(o => o.UpdatedDate).IsModified = true;
+        
+        await _blogSiteDbContext.SaveChangesAsync();
+        return _mapper.Map<PostToReturnDto>(updatingPost);
     }
 }
