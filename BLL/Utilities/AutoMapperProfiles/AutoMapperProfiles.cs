@@ -9,5 +9,7 @@ public class AutoMapperProfiles :Profile
     public AutoMapperProfiles()
     {
         CreateMap<Post, PostToAddDto>().ReverseMap();
+        CreateMap<Post, PostToReturnDto>().ReverseMap();
+        CreateMap<Post, PostToUpdate>().ReverseMap();
     }
 }
