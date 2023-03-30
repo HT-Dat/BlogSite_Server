@@ -39,15 +39,23 @@ public class PostController : Controller
 
         return Ok(postToReturnDto);
     }
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [Authorize]
+    public async Task<ActionResult<List<PostToReturnForListDto>>> GetPost()
+    {
+        var list = await _postService.GetList();
+
+        return Ok(list);
+    }
     [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [Authorize]
     public async Task<ActionResult<Post>> PutPost(PostToUpdate postToUpdate)
     {
-
         var postToReturnDto = await _postService.Update(postToUpdate);
-
         return Ok(postToReturnDto);
     }
 }
