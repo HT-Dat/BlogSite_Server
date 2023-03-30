@@ -27,7 +27,7 @@ public class Post
     public DateTime UpdatedDate { get; set; }
     
     [Column("published_date", TypeName = "datetime2(7)")]
-    public DateTime PublishedDate { get; set; }
+    public DateTime? PublishedDate { get; set; }
     
     [ForeignKey("PostStatus")]
     [Column("status_id", TypeName = "tinyint")]
