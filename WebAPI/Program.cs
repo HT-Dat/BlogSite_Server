@@ -1,7 +1,7 @@
 using BLL;
 using BLL.Services;
 using BLL.Services.IServices;
-using DAL;
+using DAL.Persistence;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -47,6 +47,8 @@ using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<BlogSiteDbContext>();
     context.Database.Migrate();
+    await Seed.SeedData(context);
+
 }
 app.UseRouting();
 app.UseAuthentication();
@@ -57,7 +59,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+app.UseSwagger();
+app.UseSwaggerUI();
 app.UseHttpsRedirection();
 
 app.UseCors(options =>
