@@ -40,6 +40,8 @@ public class Post
     [Column("content",TypeName = "nvarchar(max)")]
     public string Content { get; set; }
     
+    [Column("permalink",TypeName = "nvarchar(max)")]
+    public string Permalink { get; set; }
     public ICollection<Post> ChildPosts { get; set; }
     public ICollection<Comment> Comments { get; set; }
     public ICollection<PostCategory> PostCategories { get; set; }
