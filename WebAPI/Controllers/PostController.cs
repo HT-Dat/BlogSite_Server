@@ -61,7 +61,7 @@ public class PostController : Controller
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [Authorize]
-    public async Task<ActionResult<Post>> PutPost(PostToUpdate postToUpdate)
+    public async Task<ActionResult<Post>> PutPost(PostToUpdateDto postToUpdate)
     {
         var postToReturnDto = await _postService.Update(postToUpdate);
         return Ok(postToReturnDto);

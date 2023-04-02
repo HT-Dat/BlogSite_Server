@@ -10,4 +10,5 @@ public class PostToReturnDto
     public byte? StatusId { get; set; }
     public string Title { get; set; }
     public string Content { get; set; }
+    public string Permalink { get; set; }
 }
