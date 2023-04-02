@@ -2,6 +2,7 @@ using BLL.Services.IServices;
 using DAL.Persistence;
 using DAL.Entities;
 using DTO.DTOs;
+using Microsoft.EntityFrameworkCore;
 
 namespace BLL.Services;
 
@@ -40,23 +41,26 @@ public class AuthService : IAuthService
 
     public async Task<User> RegisterUser(UserToRegisterDto userToRegisterDto)
     {
-        var userInDb = await _blogSiteDbContext.Users.FindAsync(userToRegisterDto.id);
+        var userInDb = await _blogSiteDbContext.Users.FindAsync(userToRegisterDto.Id);
         if (userInDb != null)
         {
             userInDb.LastLogin = DateTime.UtcNow;
+            userInDb.PhotoUrl = userToRegisterDto.PhotoUrl;
+            _blogSiteDbContext.Entry<User>(userInDb).State = EntityState.Modified;
             await _blogSiteDbContext.SaveChangesAsync();
             return userInDb;
         }
         var addingUser = new User
         {
-            Id = userToRegisterDto.id,
-            Email = userToRegisterDto.email,
-            DisplayName = string.Empty,
+            Id = userToRegisterDto.Id,
+            Email = userToRegisterDto.Email,
+            DisplayName = userToRegisterDto.DisplayName,
             Intro = string.Empty,
             Profile = string.Empty,
-            SexId = 1,
+            SexId = 0,
             CreatedDate = DateTime.UtcNow,
-            LastLogin = DateTime.Now
+            LastLogin = DateTime.Now,
+            PhotoUrl = userToRegisterDto.PhotoUrl
         };
         await _blogSiteDbContext.Users.AddAsync(addingUser);
         await _blogSiteDbContext.SaveChangesAsync();

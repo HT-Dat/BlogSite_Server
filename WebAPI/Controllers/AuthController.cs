@@ -29,10 +29,14 @@ public class AuthController : Controller
     [Authorize]
     public async Task<IActionResult> Register()
     {
+        var auth = FirebaseAuth.DefaultInstance;
+        var userGetFormFirebase = await auth.GetUserAsync(User.FindFirst(ClaimTypes.NameIdentifier).Value);
         var userToRegisterDto = new UserToRegisterDto
         {
-            id = User.FindFirst(ClaimTypes.NameIdentifier).Value,
-            email = User.FindFirst(ClaimTypes.Email).Value
+            Id = User.FindFirst(ClaimTypes.NameIdentifier).Value,
+            Email = User.FindFirst(ClaimTypes.Email).Value,
+            DisplayName = userGetFormFirebase.DisplayName,
+            PhotoUrl = userGetFormFirebase.PhotoUrl
         };
         var user = await _authService.RegisterUser(userToRegisterDto);
         return Ok(user);

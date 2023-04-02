@@ -23,9 +23,7 @@ public class PostController : Controller
         _storageClient = storageClient;
     }
 
-    [HttpPost]
-    [ProducesResponseType(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [HttpPost("my-content")]
     [Authorize]
     public async Task<ActionResult<Post>> PostPost()
     {
@@ -35,9 +33,8 @@ public class PostController : Controller
         return Ok(a);
     }
 
-    [HttpGet("{id}")]
-    [ProducesResponseType(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [HttpGet("my-content/{id}")]
+
     [Authorize]
     public async Task<ActionResult<Post>> GetPost(int id)
     {
@@ -46,9 +43,7 @@ public class PostController : Controller
         return Ok(postToReturnDto);
     }
 
-    [HttpGet]
-    [ProducesResponseType(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [HttpGet("my-content")]
     [Authorize]
     public async Task<ActionResult<List<PostToReturnForListDto>>> GetPost()
     {
@@ -56,10 +51,14 @@ public class PostController : Controller
 
         return Ok(list);
     }
+    [HttpGet("public")]
+    public async Task<ActionResult<List<PostToReturnForListPublicDto>>> GetPostPublic()
+    {
+        var list = await _postService.GetListPublic();
+        return Ok(list);
+    }
 
-    [HttpPut("{id}")]
-    [ProducesResponseType(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [HttpPut("my-content/{id}")]
     [Authorize]
     public async Task<ActionResult<Post>> PutPost(PostToUpdateDto postToUpdate)
     {
@@ -68,8 +67,8 @@ public class PostController : Controller
     }
 
     [Authorize]
-    [HttpPost("upload-editor-image")]
-    public async Task<JsonResult> UploadCKEditorImage()
+    [HttpPost("my-content/upload-editor-image")]
+    public async Task<JsonResult> UploadCkEditorImage()
     {
         var files = Request.Form.Files;
         if (files.Count == 0)

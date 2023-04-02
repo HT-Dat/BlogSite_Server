@@ -3,6 +3,7 @@ using BLL.Services.IServices;
 using DAL.Persistence;
 using DAL.Entities;
 using DTO.DTOs;
+using HtmlAgilityPack;
 using Microsoft.EntityFrameworkCore;
 
 namespace BLL.Services;
@@ -30,7 +31,12 @@ public class PostService : IPostService
         var mappedList = _mapper.Map<List<Post>, List<PostToReturnForListDto>>(listPostFromDb);
         return mappedList;
     }
-
+    public async Task<List<PostToReturnForListPublicDto>> GetListPublic()
+    {
+        var listPostFromDb = await _blogSiteDbContext.Posts.Include(o => o.Author).ToListAsync();
+        var mappedList = _mapper.Map<List<Post>, List<PostToReturnForListPublicDto>>(listPostFromDb);
+        return mappedList;
+    }
     public async Task<Post> Add(string authorId)
     {
         var addedPost = new Post
@@ -41,7 +47,9 @@ public class PostService : IPostService
             CreatedDate = DateTime.UtcNow,
             UpdatedDate = DateTime.UtcNow,
             StatusId = 0,
-            Permalink = string.Empty
+            Permalink = string.Empty,
+            Preview = string.Empty,
+            ThumbnailUrl = String.Empty,
         };
         await _blogSiteDbContext.Posts.AddAsync(addedPost);
         await _blogSiteDbContext.SaveChangesAsync();
@@ -57,7 +65,8 @@ public class PostService : IPostService
     {
         var updatingPost = _mapper.Map<Post>(postToUpdate);
         updatingPost.UpdatedDate = DateTime.UtcNow;
-
+        updatingPost.Preview = GetPreview(updatingPost.Content);
+        updatingPost.ThumbnailUrl = GetThumbnailUrl(updatingPost.Content);
         foreach (var propInfo in typeof(Post).GetProperties())
         {
             var postPropValue = propInfo.GetValue(updatingPost);
@@ -73,7 +82,39 @@ public class PostService : IPostService
                 }
             }
         }
+        
         await _blogSiteDbContext.SaveChangesAsync();
         return _mapper.Map<PostToReturnDto>(updatingPost);
     }
+    private string GetPreview(string input)
+    {
+        if (string.IsNullOrEmpty(input))
+        {
+            return string.Empty;
+        }
+        var htmlDoc = new HtmlDocument();
+        htmlDoc.LoadHtml(input);
+
+        var fullPost =  htmlDoc.DocumentNode.InnerText;
+        string[] words = fullPost.Split(' ');
+        return string.Join(" ", words.Take(50).ToArray());
+    }
+
+    private string GetThumbnailUrl(string input)
+    {
+        if (string.IsNullOrEmpty(input))
+        {
+            return string.Empty;
+        }
+        var htmlDoc = new HtmlDocument();
+        htmlDoc.LoadHtml(input);
+        var firstImageNode = htmlDoc.DocumentNode.SelectSingleNode("//img");
+        if (firstImageNode == null)
+        {
+            return string.Empty;
+        }
+
+        return firstImageNode.GetAttributeValue("src", string.Empty);
+    }
 }
+

@@ -36,6 +36,10 @@ public class User
     [Column("is_admin",TypeName = "bit")]
     public bool IsAdmin { get; set; }
     
+    [Column("photo_url", TypeName = "nvarchar(max)")]
+    public string PhotoUrl { get; set; }
+    
     public ICollection<Comment> Comments { get; set; }
     public ICollection<Post> Posts { get; set; }
+    
 }

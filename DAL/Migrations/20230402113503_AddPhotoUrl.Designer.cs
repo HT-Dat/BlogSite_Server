@@ -4,6 +4,7 @@ using DAL.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DAL.Migrations
 {
     [DbContext(typeof(BlogSiteDbContext))]
-    partial class BlogSiteDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230402113503_AddPhotoUrl")]
+    partial class AddPhotoUrl
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -121,11 +124,6 @@ namespace DAL.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("permalink");
 
-                    b.Property<string>("Preview")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("preview");
-
                     b.Property<DateTime?>("PublishedDate")
                         .HasColumnType("datetime2(7)")
                         .HasColumnName("published_date");
@@ -133,11 +131,6 @@ namespace DAL.Migrations
                     b.Property<byte?>("StatusId")
                         .HasColumnType("tinyint")
                         .HasColumnName("status_id");
-
-                    b.Property<string>("ThumbnailUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("thumbnailUrl");
 
                     b.Property<string>("Title")
                         .IsRequired()
