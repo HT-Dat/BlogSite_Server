@@ -34,7 +34,6 @@ public class PostController : Controller
     }
 
     [HttpGet("my-content/{id}")]
-
     [Authorize]
     public async Task<ActionResult<Post>> GetPost(int id)
     {
@@ -42,12 +41,19 @@ public class PostController : Controller
 
         return Ok(postToReturnDto);
     }
-
+    [HttpGet("public/{permalink}")]
+    public async Task<ActionResult<PostToReturnPublicDto>> GetPostPublic(string permalink)
+    {
+        
+        var postToReturnPublicDto = await _postService.GetPublic(permalink);
+        return Ok(postToReturnPublicDto);
+    }
     [HttpGet("my-content")]
     [Authorize]
     public async Task<ActionResult<List<PostToReturnForListDto>>> GetPost()
     {
-        var list = await _postService.GetList();
+        var authorId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+        var list = await _postService.GetList(authorId);
 
         return Ok(list);
     }
@@ -62,8 +68,17 @@ public class PostController : Controller
     [Authorize]
     public async Task<ActionResult<Post>> PutPost(PostToUpdateDto postToUpdate)
     {
-        var postToReturnDto = await _postService.Update(postToUpdate);
+        var authorId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+        var postToReturnDto = await _postService.Update(postToUpdate, authorId);
         return Ok(postToReturnDto);
+    }
+    [HttpDelete("my-content/{id}")]
+    [Authorize]
+    public async Task<ActionResult<Post>> DeletePost(int id)
+    {
+        var authorId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+        await _postService.Delete(id, authorId);
+        return Ok();
     }
 
     [Authorize]
@@ -100,7 +115,7 @@ public class PostController : Controller
             formFile.CopyTo(memoryStream);
             memoryStream.Position = 0;
             
-            await _storageClient.UploadObjectAsync(obj, await Crop(memoryStream, 400, 300));
+            await _storageClient.UploadObjectAsync(obj, await Crop(memoryStream, 600, 600));
         }
 
         var previewPath =
@@ -127,4 +142,5 @@ public class PostController : Controller
         await image.SaveAsync(outputStream, image.Metadata.DecodedImageFormat);
         return outputStream;
     }
+
 }
