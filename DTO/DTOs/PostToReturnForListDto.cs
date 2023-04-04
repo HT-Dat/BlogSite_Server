@@ -6,4 +6,5 @@ public class PostToReturnForListDto
     public DateTime UpdatedDate { get; set; }
     public byte? StatusId { get; set; }
     public string Title { get; set; }
+    public string ThumbnailUrl { get; set; }
 }
