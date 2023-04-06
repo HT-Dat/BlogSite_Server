@@ -14,7 +14,7 @@ public class PostService : IPostService
 {
     private readonly BlogSiteDbContext _blogSiteDbContext;
     private readonly IMapper _mapper;
-    private readonly byte DRAFT = 2;
+    private readonly byte DRAFT = 0;
     private readonly byte PENDING = 1;
     private readonly byte PUBLISHED = 2;
 
@@ -100,14 +100,11 @@ public class PostService : IPostService
 
         var isAuthorAdmin = await _blogSiteDbContext.Users.Where(o => o.Id == authorId).Select(o => o.IsAdmin)
             .FirstOrDefaultAsync();
-        if (isAuthorAdmin == false)
+        if (isAuthorAdmin == false && updatingPost.StatusId != null)
         {
-            if (updatingPost.StatusId != null)
+            if (updatingPost.StatusId > 0)
             {
-                if (updatingPost.StatusId > 0)
-                {
-                    updatingPost.StatusId = DRAFT;
-                }
+                updatingPost.StatusId = PENDING;
             }
         }
 
