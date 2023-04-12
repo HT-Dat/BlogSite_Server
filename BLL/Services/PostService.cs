@@ -2,6 +2,7 @@ using System.Net;
 using System.Text.RegularExpressions;
 using AutoMapper;
 using BLL.Services.IServices;
+using BLL.Utilities;
 using DAL.Persistence;
 using DAL.Entities;
 using DTO.DTOs;
@@ -14,14 +15,17 @@ public class PostService : IPostService
 {
     private readonly BlogSiteDbContext _blogSiteDbContext;
     private readonly IMapper _mapper;
+    private readonly ISystemClock _systemClock;
+    
     private readonly byte DRAFT = 0;
     private readonly byte PENDING = 1;
     private readonly byte PUBLISHED = 2;
 
-    public PostService(BlogSiteDbContext blogSiteDbContext, IMapper mapper)
+    public PostService(BlogSiteDbContext blogSiteDbContext, IMapper mapper, ISystemClock systemClock)
     {
         _blogSiteDbContext = blogSiteDbContext;
         _mapper = mapper;
+        _systemClock = systemClock;
     }
 
     public async Task<PostToReturnDto> Get(int id)
@@ -196,14 +200,15 @@ public class PostService : IPostService
         }
 
         //check if exist post that have the same permalink
-        var postGetFromDb = await _blogSiteDbContext.Posts.Where(o => o.Permalink == encodedUrl).AsNoTracking()
+        var idPostHaveEncodedUrl = await _blogSiteDbContext.Posts.Where(o => o.Permalink == encodedUrl).Select(o=>o.Id)
             .FirstOrDefaultAsync();
-        if (postGetFromDb != null)
+        if (idPostHaveEncodedUrl != null)
         {
-            if (postGetFromDb.Id != idPostReceivingFromFe)
+            if (idPostHaveEncodedUrl != idPostReceivingFromFe)
             {
                 //Make numericDate and append to permalink
-                encodedUrl += $"-{GetCurrentTimeAdNumericDate()}";
+                var numericDate = new TimeHelper(_systemClock).CurrentNumericDate(); 
+                encodedUrl += $"-{numericDate}";
             }
         }
 
@@ -211,10 +216,5 @@ public class PostService : IPostService
         return encodedUrl;
     }
 
-    private string GetCurrentTimeAdNumericDate()
-    {
-        DateTime unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-        TimeSpan timeSinceEpoch = DateTime.UtcNow - unixEpoch;
-        return ((long)timeSinceEpoch.TotalSeconds).ToString();
-    }
+   
 }
