@@ -15,17 +15,17 @@ public class PostService : IPostService
 {
     private readonly BlogSiteDbContext _blogSiteDbContext;
     private readonly IMapper _mapper;
-    private readonly ISystemClock _systemClock;
+    private readonly ITimeHelper _timeHelper;
     
     private readonly byte DRAFT = 0;
     private readonly byte PENDING = 1;
     private readonly byte PUBLISHED = 2;
 
-    public PostService(BlogSiteDbContext blogSiteDbContext, IMapper mapper, ISystemClock systemClock)
+    public PostService(BlogSiteDbContext blogSiteDbContext, IMapper mapper, ITimeHelper timeHelper)
     {
         _blogSiteDbContext = blogSiteDbContext;
         _mapper = mapper;
-        _systemClock = systemClock;
+        _timeHelper = timeHelper;
     }
 
     public async Task<PostToReturnDto> Get(int id)
@@ -162,21 +162,20 @@ public class PostService : IPostService
         return string.Join(" ", words.Take(50).ToArray());
     }
 
-    private string GetThumbnailUrl(string input)
+    private string GetThumbnailUrl(string postContent)
     {
-        if (string.IsNullOrEmpty(input))
+        if (string.IsNullOrEmpty(postContent))
         {
             return null;
         }
 
         var htmlDoc = new HtmlDocument();
-        htmlDoc.LoadHtml(input);
+        htmlDoc.LoadHtml(postContent);
         var firstImageNode = htmlDoc.DocumentNode.SelectSingleNode("//img");
         if (firstImageNode == null)
         {
             return string.Empty;
         }
-
         return firstImageNode.GetAttributeValue("src", string.Empty);
     }
 
@@ -207,7 +206,7 @@ public class PostService : IPostService
             if (idPostHaveEncodedUrl != idPostReceivingFromFe)
             {
                 //Make numericDate and append to permalink
-                var numericDate = new TimeHelper(_systemClock).CurrentNumericDate(); 
+                var numericDate = _timeHelper.CurrentNumericDate(); 
                 encodedUrl += $"-{numericDate}";
             }
         }
