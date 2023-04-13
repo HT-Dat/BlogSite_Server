@@ -1,6 +1,6 @@
 namespace BLL.Utilities;
 
-public class TimeHelper
+public class TimeHelper : ITimeHelper
 {
     private readonly ISystemClock _systemClock;
 
