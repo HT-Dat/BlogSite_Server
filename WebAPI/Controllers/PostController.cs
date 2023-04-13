@@ -15,12 +15,11 @@ namespace WebAPI.Controllers;
 public class PostController : Controller
 {
     private readonly IPostService _postService;
-    private readonly StorageClient _storageClient;
-
-    public PostController(IPostService postService, StorageClient storageClient)
+    private readonly IImageService _imageService;
+    public PostController(IPostService postService, IImageService imageService)
     {
         _postService = postService;
-        _storageClient = storageClient;
+        _imageService = imageService;
     }
 
     [HttpPost("my-content")]
@@ -98,28 +97,15 @@ public class PostController : Controller
 
         var formFile = files[0];
         var upFileName = formFile.FileName;
-
-        var fileName = Path.GetFileNameWithoutExtension(upFileName) +
-                       DateTime.Now.ToString("yyyyMMddHHmmss") + Path.GetExtension(upFileName);
-        string bucketName = "hotiendat-blog.appspot.com";
-        var bucket = _storageClient.GetBucket(bucketName);
-        var obj = new Google.Apis.Storage.v1.Data.Object
-        {
-            Bucket = bucketName,
-            Name = $"post_img/{fileName}",
-            ContentType = formFile.ContentType
-        };
-        
+        var previewPath = string.Empty;
         using (var memoryStream = new MemoryStream())
         {
             formFile.CopyTo(memoryStream);
             memoryStream.Position = 0;
-            
-            await _storageClient.UploadObjectAsync(obj, await Crop(memoryStream, 600, 600));
+            previewPath = await _imageService.UploadImageFireStore(memoryStream, upFileName, formFile.ContentType);
         }
-
-        var previewPath =
-            $"https://firebasestorage.googleapis.com/v0/b/{bucketName}/o/{Uri.EscapeDataString(obj.Name)}?alt=media";
+        
+        
         bool result = true;
         var rUpload = new
         {
@@ -128,19 +114,4 @@ public class PostController : Controller
         };
         return Json(rUpload);
     }
-
-    private async Task<MemoryStream> Crop(MemoryStream stream, int maxWidth, int maxHeight)
-    {
-        Image image = await Image.LoadAsync(stream);
-        var resizeOptions = new ResizeOptions()
-        {
-            Size = new Size(maxWidth, maxHeight),
-            Mode = ResizeMode.Max
-        };
-        image.Mutate(x => x.Resize(resizeOptions));
-        MemoryStream outputStream = new MemoryStream();
-        await image.SaveAsync(outputStream, image.Metadata.DecodedImageFormat);
-        return outputStream;
-    }
-
 }
