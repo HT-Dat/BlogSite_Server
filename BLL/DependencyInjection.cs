@@ -15,5 +15,7 @@ public static class DependencyInjection
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IPostService, PostService>();
         services.AddScoped<ISystemClock, SystemClock>();
+        services.AddScoped<IImageService, ImageService>();
+        services.AddScoped<ITimeHelper, TimeHelper>();
     }
 }
