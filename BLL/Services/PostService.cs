@@ -16,7 +16,7 @@ public class PostService : IPostService
     private readonly BlogSiteDbContext _blogSiteDbContext;
     private readonly IMapper _mapper;
     private readonly ITimeHelper _timeHelper;
-    
+
     private readonly byte DRAFT = 0;
     private readonly byte PENDING = 1;
     private readonly byte PUBLISHED = 2;
@@ -90,6 +90,34 @@ public class PostService : IPostService
         await _blogSiteDbContext.SaveChangesAsync();
     }
 
+    private async Task<Post> UpdatingPostWithFullData(PostToUpdateDto postToUpdateDto, string authorId)
+    {
+        var updatingPostFullData = _mapper.Map<Post>(postToUpdateDto);
+        updatingPostFullData.UpdatedDate = DateTime.UtcNow;
+        updatingPostFullData.Preview = GetPreviewContent(postToUpdateDto.Content);
+        updatingPostFullData.ThumbnailUrl = GetThumbnailUrl(postToUpdateDto.Content);
+        var isAuthorAdmin = await _blogSiteDbContext.Users.Where(o => o.Id == authorId).Select(o => o.IsAdmin)
+            .FirstOrDefaultAsync();
+        if (isAuthorAdmin == false && updatingPostFullData.StatusId != null)
+        {
+            if (updatingPostFullData.StatusId > 0)
+            {
+                updatingPostFullData.StatusId = PENDING;
+            }
+        }
+
+        if (updatingPostFullData.StatusId != 0)
+        {
+            updatingPostFullData.PublishedDate = DateTime.UtcNow;
+        }
+
+        updatingPostFullData.Permalink =
+            await EncodeAndValidatePermalink(
+                GetUnencodedPermalink(updatingPostFullData.Title, updatingPostFullData.Permalink),
+                updatingPostFullData.Id);
+        return updatingPostFullData;
+    }
+
     public async Task<PostToReturnDto> Update(PostToUpdateDto postToUpdate, string authorId)
     {
         if (_blogSiteDbContext.Posts.Any(x => (x.Id == postToUpdate.Id) && (x.AuthorId == authorId)) == false)
@@ -97,65 +125,33 @@ public class PostService : IPostService
             return new PostToReturnDto();
         }
 
-        var updatingPost = _mapper.Map<Post>(postToUpdate);
-        updatingPost.UpdatedDate = DateTime.UtcNow;
-        updatingPost.Preview = GetPreview(updatingPost.Content);
-        updatingPost.ThumbnailUrl = GetThumbnailUrl(updatingPost.Content);
-
-        var isAuthorAdmin = await _blogSiteDbContext.Users.Where(o => o.Id == authorId).Select(o => o.IsAdmin)
-            .FirstOrDefaultAsync();
-        if (isAuthorAdmin == false && updatingPost.StatusId != null)
-        {
-            if (updatingPost.StatusId > 0)
-            {
-                updatingPost.StatusId = PENDING;
-            }
-        }
-
-        if (updatingPost.StatusId != 0)
-        {
-            updatingPost.PublishedDate = DateTime.UtcNow;
-        }
-
-        if ((string.IsNullOrWhiteSpace(updatingPost.Title) == false) &&
-            (string.IsNullOrWhiteSpace(updatingPost.Permalink) == false))
-        {
-            updatingPost.Permalink = await EncodeAndValidatePermalink(updatingPost.Permalink, updatingPost.Id);
-        }
-        else if (string.IsNullOrWhiteSpace(updatingPost.Title))
-        {
-            updatingPost.Permalink = await EncodeAndValidatePermalink(updatingPost.Permalink, updatingPost.Id);
-        }
-        else if (string.IsNullOrWhiteSpace(updatingPost.Permalink))
-        {
-            updatingPost.Permalink = await EncodeAndValidatePermalink(updatingPost.Title, updatingPost.Id);
-        }
+        var updatingPostFullData = await UpdatingPostWithFullData(postToUpdate, authorId);
 
         foreach (var propInfo in typeof(Post).GetProperties())
         {
-            var postPropValue = propInfo.GetValue(updatingPost);
+            var postPropValue = propInfo.GetValue(updatingPostFullData);
             if (postPropValue != null && propInfo.Name != "Id")
             {
                 if ((postPropValue is DateTime time && time == default(DateTime)) == false)
                 {
-                    _blogSiteDbContext.Entry<Post>(updatingPost).Property(propInfo.Name).IsModified = true;
+                    _blogSiteDbContext.Entry<Post>(updatingPostFullData).Property(propInfo.Name).IsModified = true;
                 }
             }
         }
 
         await _blogSiteDbContext.SaveChangesAsync();
-        return _mapper.Map<PostToReturnDto>(updatingPost);
+        return _mapper.Map<PostToReturnDto>(updatingPostFullData);
     }
 
-    private string GetPreview(string input)
+    private string GetPreviewContent(string content)
     {
-        if (string.IsNullOrEmpty(input))
+        if (string.IsNullOrEmpty(content))
         {
             return null;
         }
 
         var htmlDoc = new HtmlDocument();
-        htmlDoc.LoadHtml(input);
+        htmlDoc.LoadHtml(content);
 
         var fullPost = htmlDoc.DocumentNode.InnerText;
         string[] words = fullPost.Split(' ');
@@ -176,20 +172,38 @@ public class PostService : IPostService
         {
             return string.Empty;
         }
+
         return firstImageNode.GetAttributeValue("src", string.Empty);
     }
 
-    private async Task<string> EncodeAndValidatePermalink(string input, int idPostReceivingFromFe)
+    private string GetUnencodedPermalink(string title, string permalinkField)
     {
-        if (string.IsNullOrEmpty(input))
+        var isTitleHaveData = !string.IsNullOrWhiteSpace(title);
+        var isPermalinkFieldHaveData = !string.IsNullOrWhiteSpace(permalinkField);
+        if (!isTitleHaveData && !isPermalinkFieldHaveData)
         {
-            return null;
+            return string.Empty;
         }
 
-        input = input.Trim();
-        input = input.ToLower();
+        if (isPermalinkFieldHaveData)
+        {
+            return permalinkField;
+        }
+
+        return title;
+    }
+
+    private async Task<string> EncodeAndValidatePermalink(string unencodedPermalink, int postId)
+    {
+        if (string.IsNullOrEmpty(unencodedPermalink))
+        {
+            return string.Empty;
+        }
+
+        unencodedPermalink = unencodedPermalink.Trim();
+        unencodedPermalink = unencodedPermalink.ToLower();
         //remove special character
-        var encodedUrl = Regex.Replace(input, @"[^\w\s-]", "");
+        var encodedUrl = Regex.Replace(unencodedPermalink, @"[^\w\s-]", "");
         //remove white space
         encodedUrl = encodedUrl.Replace(" ", "-");
         //remove --
@@ -199,21 +213,17 @@ public class PostService : IPostService
         }
 
         //check if exist post that have the same permalink
-        var idPostHaveEncodedUrl = await _blogSiteDbContext.Posts.Where(o => o.Permalink == encodedUrl).Select(o=>o.Id)
+        var idPostHaveEncodedUrl = await _blogSiteDbContext.Posts.Where(o => o.Permalink == encodedUrl)
+            .Select(o => o.Id)
             .FirstOrDefaultAsync();
-        if (idPostHaveEncodedUrl != null)
+        if (idPostHaveEncodedUrl != 0 && idPostHaveEncodedUrl != postId)
         {
-            if (idPostHaveEncodedUrl != idPostReceivingFromFe)
-            {
-                //Make numericDate and append to permalink
-                var numericDate = _timeHelper.CurrentNumericDate(); 
-                encodedUrl += $"-{numericDate}";
-            }
+            //Make numericDate and append to permalink
+            var numericDate = _timeHelper.CurrentNumericDate();
+            encodedUrl += $"-{numericDate}";
         }
 
 
         return encodedUrl;
     }
-
-   
 }
