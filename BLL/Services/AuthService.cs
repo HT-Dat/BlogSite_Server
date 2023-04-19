@@ -1,4 +1,5 @@
 using BLL.Services.IServices;
+using BLL.Utilities;
 using DAL.Persistence;
 using DAL.Entities;
 using DTO.DTOs;
@@ -10,11 +11,12 @@ public class AuthService : IAuthService
 {
     private readonly string REGISTERED_STATUS = "registered";
     private readonly string UNREGISTERED_STATUS = "unregistered";
-    private readonly BlogSiteDbContext _blogSiteDbContext;
-
-    public AuthService(BlogSiteDbContext blogSiteDbContext)
+    private readonly IBlogSiteDbContext _blogSiteDbContext;
+    private readonly ISystemClock _systemClock;
+    public AuthService(IBlogSiteDbContext blogSiteDbContext, ISystemClock systemClock)
     {
         _blogSiteDbContext = blogSiteDbContext;
+        _systemClock = systemClock;
     }
 
     public async Task<UserRegistrationStatusReturnDto> VerifyAccess(string uid)
@@ -44,9 +46,9 @@ public class AuthService : IAuthService
         var userInDb = await _blogSiteDbContext.Users.FindAsync(userToRegisterDto.Id);
         if (userInDb != null)
         {
-            userInDb.LastLogin = DateTime.UtcNow;
+            userInDb.LastLogin = _systemClock.UtcNow;
             userInDb.PhotoUrl = userToRegisterDto.PhotoUrl;
-            _blogSiteDbContext.Entry<User>(userInDb).State = EntityState.Modified;
+            _blogSiteDbContext.SetModified(userInDb);
             await _blogSiteDbContext.SaveChangesAsync();
             return userInDb;
         }
@@ -65,6 +67,6 @@ public class AuthService : IAuthService
         await _blogSiteDbContext.Users.AddAsync(addingUser);
         await _blogSiteDbContext.SaveChangesAsync();
         return addingUser;
-
+        
     }
 }
