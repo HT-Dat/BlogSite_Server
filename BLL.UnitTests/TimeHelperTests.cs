@@ -4,7 +4,10 @@ using BLL.Utilities;
 using Xunit;
 
 namespace BLL.UnitTests;
-
+public class MockSystemClock : ISystemClock
+{
+    public DateTime UtcNow { get; set; }
+}
 public class TimeHelperTests
 {
     [Fact]
