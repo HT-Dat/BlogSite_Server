@@ -2,6 +2,7 @@ using BLL.Services;
 using BLL.Services.IServices;
 using BLL.Utilities;
 using BLL.Utilities.AutoMapperProfiles;
+using DAL.Persistence;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -17,5 +18,6 @@ public static class DependencyInjection
         services.AddScoped<ISystemClock, SystemClock>();
         services.AddScoped<IImageService, ImageService>();
         services.AddScoped<ITimeHelper, TimeHelper>();
+        services.AddScoped<IBlogSiteDbContext>(provider => provider.GetRequiredService<BlogSiteDbContext>());
     }
 }
