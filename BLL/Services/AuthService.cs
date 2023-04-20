@@ -60,8 +60,8 @@ public class AuthService : IAuthService
             Intro = string.Empty,
             Profile = string.Empty,
             SexId = 0,
-            CreatedDate = DateTime.UtcNow,
-            LastLogin = DateTime.Now,
+            CreatedDate = _systemClock.UtcNow,
+            LastLogin = _systemClock.UtcNow,
             PhotoUrl = userToRegisterDto.PhotoUrl
         };
         await _blogSiteDbContext.Users.AddAsync(addingUser);
