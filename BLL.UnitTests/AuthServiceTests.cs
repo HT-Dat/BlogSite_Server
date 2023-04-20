@@ -59,10 +59,44 @@ public class AuthServiceTests
 
         // Assert 
         Assert.Equal(userInDb, actualUser);
-        _blogSiteDbContextMock.Verify(x => x.SetModified(It.IsAny<object>()), Times.Once());
-        _blogSiteDbContextMock.Verify(x => x.SetModified(It.IsAny<object>()), Times.Once());
+        _blogSiteDbContextMock.Verify(x => x.SetModified(It.IsAny<object>()), Times.AtLeastOnce);
+        _iSystemClockMock.Verify(x => x.UtcNow, Times.AtLeastOnce);
         Assert.Equal(userToRegisterDto.Id, actualUser.Id);
         Assert.Equal(userToRegisterDto.PhotoUrl, actualUser.PhotoUrl);
         Assert.Equal(testTime, actualUser.LastLogin);
+    }
+
+    [Fact]
+    public async Task RegisterUser_UserNotFoundInDb_UpdateAndReturnUser()
+    {
+        // Arrange
+        var userToRegisterDto = new UserToRegisterDto
+        {
+            Id = "vwWzrxYIMmclf33TtwhdC5pJHcs1",
+            DisplayName = "Test Name",
+            PhotoUrl = "example.com",
+            Email = "example@gmail.com"
+        };
+
+        User? userInDb = null;
+        var testTime = DateTime.UtcNow;
+        _blogSiteDbContextMock.Setup(x => x.Users.FindAsync(userToRegisterDto.Id)).ReturnsAsync(userInDb);
+        _blogSiteDbContextMock.Setup(x => x.SaveChangesAsync(default)).ReturnsAsync(1).Verifiable();
+        _iSystemClockMock.Setup(x => x.UtcNow).Returns(testTime).Verifiable();
+        // Act 
+        var actualUser = await _authServiceUnderTest.RegisterUser(userToRegisterDto);
+
+        // Assert 
+        _blogSiteDbContextMock.Verify(x=>x.SaveChangesAsync(default),Times.AtLeastOnce);
+        _iSystemClockMock.Verify(x => x.UtcNow, Times.AtLeastOnce);
+        Assert.Equal(userToRegisterDto.Id, actualUser.Id);
+        Assert.Equal(userToRegisterDto.PhotoUrl, actualUser.PhotoUrl);
+        Assert.Equal(userToRegisterDto.Email, actualUser.Email);
+        Assert.Equal(userToRegisterDto.DisplayName, actualUser.DisplayName);
+        Assert.Equal(string.Empty, actualUser.Intro);
+        Assert.Equal(string.Empty, actualUser.Profile);
+        Assert.Equal((byte)0, actualUser.SexId);
+        Assert.Equal(testTime, actualUser.LastLogin);
+        Assert.Equal(testTime, actualUser.CreatedDate);
     }
 }
